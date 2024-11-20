@@ -4,9 +4,10 @@ HOMEPAGE_URL = r"https://www.taobao.com/"
 TRACK_URL = r"https://buyertrade.taobao.com/trade/itemlist/list_bought_items.htm?spm=tbpc.mytb_index.bought.1.6db2782dNjKsZF"
 HOMEPAGE_LOAD_TIME = 1
 TRACK_PAGE_LOAD_TIME = 3
-HOVER_DROPDOWN_LOAD_TIME = 4
+HOVER_DROPDOWN_DISAPPEAR_TIME = 0.5
+HOVER_DROPDOWN_LOAD_TIME = 2
 
-_DEV_VERBOSE = True
+_DEV_VERBOSE = False
 _DEV_MAX_TRACK_NUM = 16
 ## Constants
 TRACK_ENTRY_WRAPPER_SELECTOR = "div.index-mod__order-container___1ur4-"
@@ -163,7 +164,7 @@ def scrape_current_page(
         actions.move_to_element_with_offset(body, 0, 0).perform()
 
         actions.move_by_offset(-200, 0).perform()  # move to the corner
-        time.sleep(HOVER_DROPDOWN_LOAD_TIME)
+        time.sleep(HOVER_DROPDOWN_DISAPPEAR_TIME)
         actions.move_to_element(trigger_element).perform()
         time.sleep(HOVER_DROPDOWN_LOAD_TIME)
         # Perform actions after hovering
@@ -183,7 +184,7 @@ def scrape_current_page(
             continue
         last_hover_dropdowns = hover_dropdowns
 
-        time.sleep(HOVER_DROPDOWN_LOAD_TIME)
+        # time.sleep(HOVER_DROPDOWN_LOAD_TIME)
         hover_dropdown = hover_dropdowns[-1]  # always the last one
         logistic_info = hover_dropdown.text
         dev_print("Hover content:", logistic_info)
@@ -200,10 +201,12 @@ if __name__ == "__main__":
 
     login_or_load_cookie(driver, COOKIE_FILE)
 
-    page_scrape_result = scrape_current_page(
-        driver,
-    )
+    user_wants_to_scrape = True
+    while user_wants_to_scrape:
+        page_scrape_result = scrape_current_page(driver)
+        total_scrape_result.extend(page_scrape_result)
+        user_answer = input("Page scraped. 'q' to quit, otherwise continue: ")
+        user_wants_to_scrape = user_answer.lower() != "q"
 
-    print(f"Scrap result {page_scrape_result=}")
-    input("Press Enter to quit...")  # Keep the window open
+    print(f"Scrap result {total_scrape_result=}")
     driver.quit()
