@@ -12,7 +12,7 @@ _DEV_MAX_TRACK_NUM = 16
 ## Constants
 TRACK_ENTRY_WRAPPER_SELECTOR = "div.index-mod__order-container___1ur4-"
 TRACK_HEADER_SELECTOR = "td.bought-wrapper-mod__head-info-cell___29cDO"
-TRACK_ID_FROM_TRACK_HEADER_SELECTOR = ":scope > span > span:nth-child(3)"
+ORDER_ID_FROM_TRACK_HEADER_SELECTOR = ":scope > span > span:nth-child(3)"
 TRACK_HOVER_TRIGGER_SELECTOR = "a#viewLogistic"
 TRACK_DROPDOWN_SELECTOR = ".tm-tooltip"
 TRACK_DROPDOWN_LOGISTIC_SELECTOR = "div.logistics-info-mod__header___1z4Ea"
@@ -131,12 +131,12 @@ def scrape_current_page(
             By.CSS_SELECTOR,
             TRACK_HEADER_SELECTOR,
         )
-        track_id = track_header.find_element(  # type: ignore
+        order_id = track_header.find_element(  # type: ignore
             # ignore/selenium WebElement.find_element(): returns WebElement
             By.CSS_SELECTOR,
-            TRACK_ID_FROM_TRACK_HEADER_SELECTOR,
+            ORDER_ID_FROM_TRACK_HEADER_SELECTOR,
         ).text
-        dev_print("订单号:", track_id)
+        dev_print("订单号:", order_id)
 
         # mark the element
         driver.execute_script(  # type: ignore
@@ -155,9 +155,9 @@ def scrape_current_page(
         )
         if len(dropdown_trigger_elements) != 1:
             print(
-                f"Invalid number of hover elements {len(dropdown_trigger_elements)} for track {track_id}"
+                f"Invalid number of hover elements {len(dropdown_trigger_elements)} for track {order_id}"
             )
-            page_scrape_result.append((track_id, "N/A: No dropdown trigger element"))
+            page_scrape_result.append((order_id, "N/A: No dropdown trigger element"))
             continue
         trigger_element = dropdown_trigger_elements[0]
 
@@ -177,10 +177,10 @@ def scrape_current_page(
         )
         if len(hover_dropdowns) - len(last_hover_dropdowns) != 1:
             print(
-                f"Invalid number of last hover dropdowns: {len(last_hover_dropdowns)=}, {len(hover_dropdowns)=} for track {track_id}"
+                f"Invalid number of last hover dropdowns: {len(last_hover_dropdowns)=}, {len(hover_dropdowns)=} for track {order_id}"
             )
             dev_print(page_scrape_result)
-            page_scrape_result.append((track_id, "N/A: No new dropdown element"))
+            page_scrape_result.append((order_id, "N/A: No new dropdown element"))
             continue
         last_hover_dropdowns = hover_dropdowns
 
@@ -189,8 +189,8 @@ def scrape_current_page(
         logistic_info = hover_dropdown.text
         dev_print("Hover content:", logistic_info)
 
-        page_scrape_result.append((track_id, logistic_info))
-        print(f"Scrapped {track_id=}, {logistic_info=}")
+        page_scrape_result.append((order_id, logistic_info))
+        print(f"Scrapped {order_id=}, {logistic_info=}")
 
     return page_scrape_result
 
