@@ -5,10 +5,13 @@ TRACK_URL = r"https://buyertrade.taobao.com/trade/itemlist/list_bought_items.htm
 HOMEPAGE_LOAD_TIME = 1
 TRACK_PAGE_LOAD_TIME = 3
 HOVER_DROPDOWN_DISAPPEAR_TIME = 0.5
-HOVER_DROPDOWN_LOAD_TIME = 2
+HOVER_DROPDOWN_LOAD_TIME = 5
+SCROLL_BOTTOM_WAIT_TIME = 5
 
-_DEV_VERBOSE = False
-_DEV_MAX_TRACK_NUM = 16
+_DEV_VERBOSE = False  # set to True for debugging
+_DEV_MAX_TRACK_NUM = 166  # set to a large number > 100 in production
+
+
 ## Constants
 TRACK_ENTRY_WRAPPER_SELECTOR = "div.index-mod__order-container___1ur4-"
 TRACK_HEADER_SELECTOR = "td.bought-wrapper-mod__head-info-cell___29cDO"
@@ -23,6 +26,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from selenium.webdriver.remote.webelement import WebElement
+
+from taobao_track.selenium_extension import scroll_to_bottom
 
 if TYPE_CHECKING:
     from _typeshed import SupportsWrite
@@ -109,10 +114,11 @@ def login_or_load_cookie(driver: webdriver.Chrome, cookie_file: Path):
         time.sleep(TRACK_PAGE_LOAD_TIME)
 
 
-# def scrape_whole_page
+def load_whole_page(driver: webdriver.Chrome):
+    scroll_to_bottom(driver, max_attempts=20, pause_time=0.5)
 
 
-def scrape_current_page(
+def scrape_loaded_page(
     driver: webdriver.Chrome,
 ):
     page_scrape_result = list[tuple[str, str]]()
@@ -125,6 +131,7 @@ def scrape_current_page(
     for _cnt, entry_wrapper in enumerate(iterable=track_entries, start=1):
         if _cnt > _DEV_MAX_TRACK_NUM:
             break
+        print(f"{_cnt:03d}/{len(track_entries)}  ", end="")
 
         track_header = entry_wrapper.find_element(  # type: ignore
             # ignore/selenium WebElement.find_element(): returns WebElement
@@ -190,9 +197,14 @@ def scrape_current_page(
         dev_print("Hover content:", logistic_info)
 
         page_scrape_result.append((order_id, logistic_info))
-        print(f"Scrapped {order_id=}, {logistic_info=}")
+        print(f"Scraped {order_id=}, {logistic_info=}")
 
     return page_scrape_result
+
+
+def scrape_current_page(driver: webdriver.Chrome):
+    load_whole_page(driver)
+    return scrape_loaded_page(driver)
 
 
 if __name__ == "__main__":
