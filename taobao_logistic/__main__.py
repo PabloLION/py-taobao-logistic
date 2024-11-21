@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING
 
 from selenium.webdriver.remote.webelement import WebElement
 
-from taobao_track.selenium_extension import scroll_to_bottom
+from taobao_logistic.selenium_extension import scroll_to_bottom
 
 if TYPE_CHECKING:
     from _typeshed import SupportsWrite
@@ -36,7 +36,7 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 
-COOKIE_FILE = Path(__file__).parent.parent / "taobao-track-temp" / "cookies.pkl"
+COOKIE_FILE = Path(__file__).parent.parent / "taobao-logistic-temp" / "cookies.pkl"
 
 
 class Track: ...

@@ -1,4 +1,4 @@
-## Taobao Order History
+## Taobao Order Logistic Scraper
 
 Taobao does not offer a way to export the order history.
 This script is a workaround to get the order history.
@@ -22,12 +22,12 @@ I made this for personal use, but it should be easy to adapt to other uses.
     poetry install
     ```
 
-2. Change the config in the first lines in `taobao_track/__main__.py`
+2. Change the config in the first lines in `taobao_logistic/__main__.py`
 
 3. Use poetry to execute the script
 
     ```sh
-    poetry run taobao_track/__main__.py
+    poetry run taobao_logistic/__main__.py
     ```
 
 ## Note
